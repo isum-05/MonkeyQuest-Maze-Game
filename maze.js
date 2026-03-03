@@ -213,7 +213,7 @@ class CircularMaze {
 const canvas = document.getElementById("mazeCanvas");
 const ctx = canvas.getContext("2d");
 
-const maze = new CircularMaze(6, 30, ctx, 400, 400);
+const maze = new CircularMaze(3, 10, ctx, 400, 400);
 
 const tree = maze.createDFSTree();
 maze.drawMaze(tree);

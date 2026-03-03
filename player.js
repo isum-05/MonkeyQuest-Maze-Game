@@ -1,85 +1,94 @@
-movePlayer = (direction, graph) => {
+const canvas = document.getElementById('canvas1');
+const ctx = canvas.getContext('2d');
 
-    let [level, cell] = this.index2DFrom1D(this.playerIndex);
-    let target = null;
+const CANVAS_WIDTH = canvas.width = 200;
+const CANVAS_HEIGHT = canvas.height = 200;
 
-    if (direction === "left") {
-        target = this.leftIndex1D(level, cell);
+
+const playerImage = new Image();
+playerImage.src = 'image/spriteSheet.png';
+const spriteWidth = 64;
+const spriteHeight = 64;
+let gameFrame = 0;
+const staggerFrames = 7;
+
+const spriteAnimations = [];
+
+const animationStates = [
+    { 
+        name:"back",
+        frames:8
+    },
+
+    {
+        name:"back_left",
+        frames:6
+    },
+    {
+        name:"side_left",
+        frames:10
+    },
+
+    {
+        name:"front_left",
+        frames:8
+    },
+
+    {
+        name:"front",
+        frames:11
+    },
+
+    {
+        name:"front_right",
+        frames:8
+    },
+
+    {
+        name:"side_right",
+        frames:12
+    },
+
+    {
+        name:"back_right",
+        frames:6
+    },
+
+    {
+        name:"jump",
+        frames:15
+    },
+
+    {
+        name:"roll",
+        frames:6
+    },
+];
+
+animationStates.forEach((state,index)=>{
+    let frames = {
+        loc:[],
     }
-
-    if (direction === "right") {
-        target = this.rightIndex1D(level, cell);
+    for(let j=0; j<state.frames; j++){
+        let positionX = j * spriteWidth;
+        let positionY = index * spriteHeight;
+        frames.loc.push({x:positionX,y:positionY});
     }
-
-    if (direction === "in" && level > 0) {
-        target = this.parentIndex1D(level, cell);
-    }
-
-    if (direction === "out" && level < this.num_levels - 1) {
-
-        if (this.num_cells_at_level[level] <
-            this.num_cells_at_level[level + 1]) {
-
-            target = this.index1DFrom2D(level + 1, 2 * cell);
-
-        } else {
-            target = this.index1DFrom2D(level + 1, cell);
-        }
-    }
-
-    // Only move if there is a connection
-    if (target !== null &&
-        graph[this.playerIndex].includes(target)) {
-
-        this.playerIndex = target;
-    }
-};
-
-document.addEventListener("keydown", (e) => {
-
-    if (e.key === "ArrowLeft")
-        maze.movePlayer("left", tree);
-
-    if (e.key === "ArrowRight")
-        maze.movePlayer("right", tree);
-
-    if (e.key === "ArrowUp")
-        maze.movePlayer("out", tree);
-
-    if (e.key === "ArrowDown")
-        maze.movePlayer("in", tree);
-
-    drawEverything();
+    spriteAnimations[state.name] = frames;
 });
+console.log(spriteAnimations);
 
-drawPlayer = () => {
+function animate(){
+    ctx.clearRect(0,0,CANVAS_WIDTH,CANVAS_HEIGHT);
+    let position = Math.floor(gameFrame/staggerFrames) % spriteAnimations['front'].loc.length;
+    let frameX= spriteWidth * position;
+    let frameY = spriteAnimations['front'].loc[position].y;
 
-    let [level, cell] = this.index2DFrom1D(this.playerIndex);
+    ctx.drawImage(playerImage, frameX,frameY,spriteWidth,
+    spriteHeight,0,0,30,30);
 
-    let radius = level * this.line_length +
-                 this.line_length / 2;
-
-    let arcAngle = (2 * Math.PI) /
-                   this.num_cells_at_level[level];
-
-    let angle = cell * arcAngle + arcAngle / 2;
-
-    let x = this.centerX + radius * Math.cos(angle);
-    let y = this.centerY + radius * Math.sin(angle);
-
-    this.ctx.beginPath();
-    this.ctx.arc(x, y, 6, 0, 2 * Math.PI);
-    this.ctx.fillStyle = "red";
-    this.ctx.fill();
-};
-
-function drawEverything() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    maze.drawMaze(tree);
-    maze.drawPlayer();
+    gameFrame++;
+    requestAnimationFrame(animate);
 }
 
-if (level === maze.num_levels - 1 &&
-    playerReachedExitCell) {
-    alert("You escaped!");
-}
+animate();
