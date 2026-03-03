@@ -36,7 +36,7 @@ const animationStates = [
 
     {
         name:"front",
-        frames:10
+        frames:11
     },
 
     {
