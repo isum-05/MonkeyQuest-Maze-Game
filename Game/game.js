@@ -1,8 +1,8 @@
 
+let last_entrance, last_exit;
 
-
-const width = 11;
-const height = 11;
+const width = 25;
+const height = 25;
 
 
 const tile_size = 32;
@@ -40,11 +40,14 @@ function create_maze(){
     dig_around(start_x,start_y);
 
     create_path();
+
+    //ai generated
     Promise.all([
         new Promise(res => wallImage.onload = res),
         new Promise(res => openImage.onload = res)
     ]).then(() => {
         draw_maze();
+
     });
 }
 function dig_around(x,y){
@@ -120,33 +123,10 @@ function create_path(){
         console.error('Entrance coordinates:', entrance);
         console.error('Exit coordinates:', exit);
     }
+    last_entrance = entrance;
+    last_exit = exit;
 }
 
-
-/*function draw_maze(){
-    const container = document.getElementById('maze_display');
-    container.innerHTML = '';
-
-    for(let i=0; i < maze.length; i++){
-        for(let j=0; j< maze[i].length;j++){
-            let image_name;
-
-            let tile = maze[i][j];
-            if(tile == closed){
-                image_name = closed_tile_img;
-            }else{
-                image_name = open_tile_img;
-            }
-            let element = document.createElement('img');
-            element.src = image_name;
-            container.appendChild(element);
-        }
-        let break_element = document.createElement('br');
-        container.appendChild(break_element);
-    }
-
-
-}*/
 function draw_maze(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
 
