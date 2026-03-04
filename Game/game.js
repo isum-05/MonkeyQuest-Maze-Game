@@ -32,6 +32,9 @@ wallImage.src = closed_tile_img;
 const openImage = new Image();
 openImage.src = open_tile_img;
 
+const obstacleImage = new Image();
+obstacleImage.src = "tiles/obstacle.png"; // question mark tile
+
 function create_maze(){
     maze = create_2D_array(width,height,closed);
 
@@ -51,7 +54,7 @@ function create_maze(){
         new Promise(res => openImage.onload = res)
     ]).then(() => {
         draw_maze();
-
+        place_obstacle(2);
     });
 }
 function dig_around(x,y){
@@ -133,13 +136,23 @@ function create_path(){
 
 function draw_maze(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
-
+    
     for(let y=0; y<maze.length; y++){
         for(let x=0; x<maze[y].length; x++){
 
             let tile = maze[y][x];
-            let img = (tile === closed) ? wallImage : openImage;
+            let img;
 
+            if(tile === closed){
+                img = wallImage;
+            }
+            else if(tile === obstacle){
+                img = obstacleImage;
+                
+            }
+            else{
+                img = openImage;
+            }
             ctx.drawImage(
                 img,
                 x * tile_size,

@@ -131,7 +131,6 @@ function animatePlayer(){
 
 document.addEventListener("keydown", handleKey);
 
-document.addEventListener("keydown", handleKey);
 
 function handleKey(event){
 
@@ -177,13 +176,7 @@ function tryMove(newX, newY){
     } else if(maze[newY][newX] === obstacle){
         player.x = newX;
         player.y = newY;
-
-        if(askBananaQuestion()){
-            maze[newY][newX] = open; 
-        }else{
-            player.x = player.x; 
-            player.y = player.y;
-        };
+        askBananaQuestion(newX, newY);
     }
     else {
         isMoving = false;
@@ -203,4 +196,59 @@ function winner(){
     }
 }
 
-function askBananaQuestion(){}
+function askBananaQuestion(newX, newY){
+    fetch('https://marcconrad.com/uob/banana/api.php?out=json')
+    .then(response => response.json())
+    .then(data => {
+        const question = data.question;
+        const answer = data.answer;
+
+        let question_box = document.querySelector(".question_container");
+        document.getElementById("question").innerHTML = `<img src="${question}" id="banana_question_img" alt="Banana Question">`;
+        question_box.style.display = "flex";
+        
+        document.getElementById("banana_question_form").onsubmit = function(e){
+            e.preventDefault();
+            let user_answer = parseInt(document.getElementById("banana_answer").value);
+
+            if(user_answer === answer){
+                question_box.style.display = "none";
+                maze[newY][newX] = open;
+            }else{
+                document.querySelector(".alert").innerHTML = "Incorrect! Try again.";
+                setTimeout(() => {
+                        question_box.style.display = "none";
+                        player.x = last_entrance.x;
+                        player.y = last_entrance.y;
+                }, 2000);
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching banana question:', error);
+        player.x = 1;
+        player.y = 1;
+    });
+}
+
+
+
+
+
+
+//styling asthetics 
+
+const sliderEl3 = document.querySelector("#range3")
+const sliderValue3 = document.querySelector(".value3")
+
+sliderEl3.addEventListener("input", (event) => {
+  const tempSliderValue = Number(event.target.value); 
+  
+  sliderValue3.textContent = tempSliderValue; 
+  
+  const progress = (tempSliderValue / sliderEl3.max) * 100;
+ 
+  sliderEl3.style.background = `linear-gradient(to right, #f50 ${progress}%, #ccc ${progress}%)`;
+  
+  sliderEl3.style.setProperty("--thumb-rotate", `${(tempSliderValue/100) * 2160}deg`)
+})
