@@ -1,15 +1,19 @@
 
 let last_entrance, last_exit;
 
-const width = 25;
-const height = 25;
+const width = 11;
+const height = 11;
 
 
 const tile_size = 32;
 const open = 1;
 const closed = 0;
 
-//const closed_tile_img = 'tiles/tile1.png';
+const obstacle = 2;// banana question intergration
+
+
+
+//const closed_tile_img = 'tiles/t2.png';
 const closed_tile_img = 'tiles/closed.png';
 const open_tile_img = 'tiles/open.png';
 
@@ -191,5 +195,27 @@ function create_2D_array(width, height,fill_value){
 function set_to_odd(number){
     return (number % 2 == 1) ? number  : number + 1;
 }
+
+//place obstactle
+
+function place_obstacle(count){
+    let placed = [];
+
+    for(let i = 0; i < maze.length; i++){
+        for(let j = 0; j < maze[i].length; j++){
+            if(maze[i][j] === open && !(j === last_entrance.x && i === last_entrance.y) && !(j === last_exit.x && i === last_exit.y) && !(player.x == j && player.y == i)){
+                placed.push({x:j,y:i});
+            }
+        }
+    }
+
+    placed = shuffle_array(placed);
+
+    for(let i = 0; i < count && i < placed.length; i++){
+        let tile = placed[i];
+        maze[tile.y][tile.x] = obstacle;
+    }
+}
+
 
 create_maze();

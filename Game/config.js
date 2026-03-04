@@ -79,13 +79,11 @@ animationStates.forEach((state,index)=>{
     }
     spriteAnimations[state.name] = frames;
 });
-console.log(spriteAnimations);
+//console.log(spriteAnimations);
 
 
 function animatePlayer(){
-
     draw_maze(); // draw maze first
-
     let positionX = player.x * tile_size;
     let positionY = player.y * tile_size;
 
@@ -175,10 +173,34 @@ function tryMove(newX, newY){
     if(maze[newY][newX] === open){
         player.x = newX;
         player.y = newY;
-    } else {
+        winner(); // Check for win condition after valid move
+    } else if(maze[newY][newX] === obstacle){
+        player.x = newX;
+        player.y = newY;
+
+        if(askBananaQuestion()){
+            maze[newY][newX] = open; 
+        }else{
+            player.x = player.x; 
+            player.y = player.y;
+        };
+    }
+    else {
         isMoving = false;
     }
 }
 playerImage.onload = function(){
     animatePlayer();
 };
+
+
+function winner(){
+
+    if(player.x === last_exit.x && player.y === last_exit.y){
+        alert("Congratulations! You've reached the exit!");
+        last_entrance = {x:player.x, y:player.y};
+        animatePlayer();
+    }
+}
+
+function askBananaQuestion(){}
