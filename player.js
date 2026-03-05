@@ -10,7 +10,7 @@ playerImage.src = 'image/spriteSheet.png';
 const spriteWidth = 64;
 const spriteHeight = 64;
 let gameFrame = 0;
-const staggerFrames = 7;
+const staggerFrames = 20;
 
 const spriteAnimations = [];
 

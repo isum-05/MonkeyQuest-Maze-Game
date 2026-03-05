@@ -10,12 +10,34 @@ let isMoving = false;
 
 const playerImage = new Image();
 playerImage.src = 'SpriteSheet/spriteSheet.png';
-const spriteWidth = 64;
-const spriteHeight = 64;
+
+const questionImage = new Image();
+questionImage.src = 'SpriteSheet/spriteSheet_2_mini.png';
+
+
+
+
+
+
+const spriteWidth ={
+    "player":64,
+    "question":26
+}
+const spriteHeight = {
+    "player":64,
+    "question":27
+}
+
+
 let gameFrame = 0;
 const staggerFrames = 7;
 
-const spriteAnimations = [];
+const questionStagger = 10;
+let questionFrame = 0;
+
+const spriteAnimations = {};
+
+const questionAnimations = {};
 
 const animationStates = [
     { 
@@ -68,22 +90,64 @@ const animationStates = [
     },
 ];
 
+const questionAnimationStates = [
+    {
+        name:"banana_question",
+        frames:8
+    }];
+
+questionAnimationStates.forEach((state,index)=>{
+    let frames = {
+        loc:[],
+    }
+    for(let j=0; j<state.frames; j++){
+        let positionX = j * (spriteWidth.question + 1.97);
+        let positionY = index * spriteHeight.question;
+        frames.loc.push({x:positionX,y:positionY});
+    }
+    questionAnimations[state.name] = frames;
+});
+
 animationStates.forEach((state,index)=>{
     let frames = {
         loc:[],
     }
     for(let j=0; j<state.frames; j++){
-        let positionX = j * spriteWidth;
-        let positionY = index * spriteHeight;
+        let positionX = j * spriteWidth.player;
+        let positionY = index * spriteHeight.player;
         frames.loc.push({x:positionX,y:positionY});
     }
     spriteAnimations[state.name] = frames;
 });
 //console.log(spriteAnimations);
 
+function animateQuestion(positionX, positionY){
+
+    let animation = questionAnimations["banana_question"];
+
+    let frameIndex = Math.floor(questionFrame / questionStagger) % animation.loc.length;
+
+    let frameX = animation.loc[frameIndex].x;
+    let frameY = animation.loc[frameIndex].y;
+    
+    ctx.drawImage(
+        questionImage,
+        frameX,
+        frameY,
+        spriteWidth.question,
+        spriteHeight.question,
+        positionX,
+        positionY,
+        tile_size,
+        tile_size
+    );
+    questionFrame++;
+}
+
 
 function animatePlayer(){
     draw_maze(); // draw maze first
+    draw_obstacles(); // draw obstacles on top of maze
     let positionX = player.x * tile_size;
     let positionY = player.y * tile_size;
 
@@ -117,8 +181,8 @@ function animatePlayer(){
         playerImage,
         frameX,
         frameY,
-        spriteWidth,
-        spriteHeight,
+        spriteWidth.player,
+        spriteHeight.player,
         positionX,
         positionY,
         tile_size,
@@ -169,18 +233,22 @@ function tryMove(newX, newY){
         return;
     }
 
-    if(maze[newY][newX] === open){
-        player.x = newX;
-        player.y = newY;
-        winner(); // Check for win condition after valid move
-    } else if(maze[newY][newX] === obstacle){
-        player.x = newX;
-        player.y = newY;
-        askBananaQuestion(newX, newY);
-    }
-    else {
+    if(maze[newY][newX] === closed){
         isMoving = false;
+        return;
     }
+
+    let obstacleAtNewPos = getObstacleAt(newX, newY);
+
+    if(obstacleAtNewPos){
+        askBananaQuestion(newX, newY);
+        return;
+    }
+
+    player.x = newX;
+    player.y = newY;
+
+    winner();
 }
 playerImage.onload = function(){
     animatePlayer();
@@ -192,16 +260,16 @@ function winner(){
     if(player.x === last_exit.x && player.y === last_exit.y){
         alert("Congratulations! You've reached the exit!");
         last_entrance = {x:player.x, y:player.y};
-        animatePlayer();
     }
 }
 
 function askBananaQuestion(newX, newY){
+    isMoving = false;
     fetch('https://marcconrad.com/uob/banana/api.php?out=json')
     .then(response => response.json())
     .then(data => {
         const question = data.question;
-        const answer = data.answer;
+        const answer = Number(data.solution);
 
         let question_box = document.querySelector(".question_container");
         document.getElementById("question").innerHTML = `<img src="${question}" id="banana_question_img" alt="Banana Question">`;
@@ -209,12 +277,17 @@ function askBananaQuestion(newX, newY){
         
         document.getElementById("banana_question_form").onsubmit = function(e){
             e.preventDefault();
-            let user_answer = parseInt(document.getElementById("banana_answer").value);
+            let user_answer = Math.round(Number(document.getElementById("range3").value));
 
             if(user_answer === answer){
                 question_box.style.display = "none";
-                maze[newY][newX] = open;
+
+                removeObstacle(newX, newY);   // remove obstacle
+
+                player.x = newX;              // allow movement
+                player.y = newY;
             }else{
+                console.log("Incorrect answer. Try again!");
                 document.querySelector(".alert").innerHTML = "Incorrect! Try again.";
                 setTimeout(() => {
                         question_box.style.display = "none";
@@ -231,8 +304,21 @@ function askBananaQuestion(newX, newY){
     });
 }
 
+function getObstacleAt(x,y){
 
+    for(let i=0;i<obstacle.length;i++){
+        if(obstacle[i].x === x && obstacle[i].y === y){
+            return obstacle[i];
+        }
+    }
 
+    return null;
+}
+function removeObstacle(x,y){
+
+    obstacle = obstacle.filter(o => !(o.x === x && o.y === y));
+
+}
 
 
 

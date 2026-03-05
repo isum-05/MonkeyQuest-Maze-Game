@@ -1,6 +1,8 @@
 
 let last_entrance, last_exit;
 
+let obstacle = [];
+
 const width = 11;
 const height = 11;
 
@@ -8,9 +10,6 @@ const height = 11;
 const tile_size = 32;
 const open = 1;
 const closed = 0;
-
-const obstacle = 2;// banana question intergration
-
 
 
 //const closed_tile_img = 'tiles/t2.png';
@@ -32,8 +31,8 @@ wallImage.src = closed_tile_img;
 const openImage = new Image();
 openImage.src = open_tile_img;
 
-const obstacleImage = new Image();
-obstacleImage.src = "tiles/obstacle.png"; // question mark tile
+/*const obstacleImage = new Image();
+obstacleImage.src = "tiles/obstacle.png"; // question mark tile*/
 
 function create_maze(){
     maze = create_2D_array(width,height,closed);
@@ -146,10 +145,6 @@ function draw_maze(){
             if(tile === closed){
                 img = wallImage;
             }
-            else if(tile === obstacle){
-                img = obstacleImage;
-                
-            }
             else{
                 img = openImage;
             }
@@ -226,9 +221,19 @@ function place_obstacle(count){
 
     for(let i = 0; i < count && i < placed.length; i++){
         let tile = placed[i];
-        maze[tile.y][tile.x] = obstacle;
+        obstacle.push({
+            x: tile.x,
+            y: tile.y,
+            type: "banana_question"
+        });
     }
 }
 
+function draw_obstacles(){
+    for(let i = 0; i < obstacle.length; i++){
+        let obs = obstacle[i];
+        animateQuestion(obs.x * tile_size, obs.y * tile_size);
+    }
+}
 
 create_maze();
