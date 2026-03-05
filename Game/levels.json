@@ -1,0 +1,14 @@
+{
+    "levels":[
+        {"level_1":{"height": 11,"width": 11,"coins": 10,"obstacles": 2,"timeout": 60}},
+
+        {"level_2":{"height": 13,"width": 13,"coins": 15,"obstacles": 3,"timeout": 90 }},
+
+        {"level_3":{"height": 15,"width": 15,"coins": 20,"obstacles": 4,"timeout": 120}},
+
+        {"level_4":{"height": 17,"width": 17,"coins": 25,"obstacles": 5,"timeout": 150}},
+
+        {"level_5":{"height": 19,"width": 19,"coins": 30,"obstacles": 6,"timeout": 180}}
+
+    ]
+}

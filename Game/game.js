@@ -1,5 +1,7 @@
 
+let last_entrance, last_exit;
 
+let obstacle = [];
 
 const width = 11;
 const height = 11;
@@ -9,7 +11,8 @@ const tile_size = 32;
 const open = 1;
 const closed = 0;
 
-//const closed_tile_img = 'tiles/tile1.png';
+
+//const closed_tile_img = 'tiles/t2.png';
 const closed_tile_img = 'tiles/closed.png';
 const open_tile_img = 'tiles/open.png';
 
@@ -28,6 +31,9 @@ wallImage.src = closed_tile_img;
 const openImage = new Image();
 openImage.src = open_tile_img;
 
+/*const obstacleImage = new Image();
+obstacleImage.src = "tiles/obstacle.png"; // question mark tile*/
+
 function create_maze(){
     maze = create_2D_array(width,height,closed);
 
@@ -40,11 +46,14 @@ function create_maze(){
     dig_around(start_x,start_y);
 
     create_path();
+
+    //ai generated
     Promise.all([
         new Promise(res => wallImage.onload = res),
         new Promise(res => openImage.onload = res)
     ]).then(() => {
         draw_maze();
+        place_obstacle(2);
     });
 }
 function dig_around(x,y){
@@ -120,42 +129,25 @@ function create_path(){
         console.error('Entrance coordinates:', entrance);
         console.error('Exit coordinates:', exit);
     }
+    last_entrance = entrance;
+    last_exit = exit;
 }
 
-
-/*function draw_maze(){
-    const container = document.getElementById('maze_display');
-    container.innerHTML = '';
-
-    for(let i=0; i < maze.length; i++){
-        for(let j=0; j< maze[i].length;j++){
-            let image_name;
-
-            let tile = maze[i][j];
-            if(tile == closed){
-                image_name = closed_tile_img;
-            }else{
-                image_name = open_tile_img;
-            }
-            let element = document.createElement('img');
-            element.src = image_name;
-            container.appendChild(element);
-        }
-        let break_element = document.createElement('br');
-        container.appendChild(break_element);
-    }
-
-
-}*/
 function draw_maze(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
-
+    
     for(let y=0; y<maze.length; y++){
         for(let x=0; x<maze[y].length; x++){
 
             let tile = maze[y][x];
-            let img = (tile === closed) ? wallImage : openImage;
+            let img;
 
+            if(tile === closed){
+                img = wallImage;
+            }
+            else{
+                img = openImage;
+            }
             ctx.drawImage(
                 img,
                 x * tile_size,
@@ -210,6 +202,38 @@ function create_2D_array(width, height,fill_value){
 }
 function set_to_odd(number){
     return (number % 2 == 1) ? number  : number + 1;
+}
+
+//place obstactle
+
+function place_obstacle(count){
+    let placed = [];
+
+    for(let i = 0; i < maze.length; i++){
+        for(let j = 0; j < maze[i].length; j++){
+            if(maze[i][j] === open && !(j === last_entrance.x && i === last_entrance.y) && !(j === last_exit.x && i === last_exit.y) && !(player.x == j && player.y == i)){
+                placed.push({x:j,y:i});
+            }
+        }
+    }
+
+    placed = shuffle_array(placed);
+
+    for(let i = 0; i < count && i < placed.length; i++){
+        let tile = placed[i];
+        obstacle.push({
+            x: tile.x,
+            y: tile.y,
+            type: "banana_question"
+        });
+    }
+}
+
+function draw_obstacles(){
+    for(let i = 0; i < obstacle.length; i++){
+        let obs = obstacle[i];
+        animateQuestion(obs.x * tile_size, obs.y * tile_size);
+    }
 }
 
 create_maze();
