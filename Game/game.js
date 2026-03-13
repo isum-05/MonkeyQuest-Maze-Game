@@ -3,8 +3,8 @@ let last_entrance, last_exit;
 
 let obstacle = [];
 
-const width = 21;
-const height = 21;
+const width = 11;
+const height = 11;
 
 
 const tile_size = 32;
@@ -234,6 +234,7 @@ function draw_obstacles(){
         let obs = obstacle[i];
         animateQuestion(obs.x * tile_size, obs.y * tile_size);
     }
+    questionFrame++;
 }
 
 create_maze();

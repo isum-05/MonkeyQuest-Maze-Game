@@ -43,6 +43,7 @@
         </div>
     </div>   
 </body>
+<script src="/BackEnd/User.js"></script>
 <script>
 const textBox = document.getElementById("monkeyText");
 textBox.innerHTML = "Thinking...";
@@ -75,23 +76,40 @@ setInterval(monkeySpeak, 5000);
 
 
 
+const loginBox = document.getElementById("loginBox");
+const loginBtn = document.getElementById("login-btn");
+
 function isLogged(){
-    const user = localStorage.getItem("user");
+    const user = localStorage.getItem("User");
     const session = sessionStorage.getItem("ActiveSession");
 
     if(user && session){
-
-
-      return true;
-    }else{
-        document.querySelector(".login").style.display= "grid";
-        
+        window.location.href = "game.html";
+        return true;
+    } else {
+        loginBox.style.display = "grid";
         return false;
     }
 }
+
 function closeLogin(){
-    document.getElementById("loginBox").style.display = "none";
+    loginBox.style.display = "none";
 }
+
+loginBtn.addEventListener("click", () => {
+    const nameInput = document.getElementById("name").value.trim();
+
+    if(nameInput === ""){
+        alert("Please enter your name to continue!");
+        return;
+    }
+
+    const player = new User(nameInput,0,0);
+    player.save();
+
+    window.location.href = "game.html";
+});
+
 
 </script>
 </html>
