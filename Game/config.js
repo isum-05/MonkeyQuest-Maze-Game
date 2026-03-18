@@ -15,10 +15,6 @@ const questionImage = new Image();
 questionImage.src = 'SpriteSheet/spriteSheet_2_mini.png';
 
 
-
-
-
-
 const spriteWidth ={
     "player":64,
     "question":26
@@ -141,7 +137,6 @@ function animateQuestion(positionX, positionY){
         tile_size,
         tile_size
     );
-    questionFrame++;
 }
 
 
